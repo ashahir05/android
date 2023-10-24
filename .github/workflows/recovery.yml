@@ -53,7 +53,7 @@ jobs:
       - name: Prepare environment
         run: |
           sudo apt update -y
-          sudo apt install -y linux-image-extra
+          sudo apt install -y linux-modules-extra-azure
           
           sudo modprobe zram
           sudo zramctl /dev/zram0 --algorithm zstd --size 32G
