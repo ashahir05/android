@@ -2,7 +2,7 @@
 	path = tools
 	url = https://github.com/ashahir05/android_extract_utils
 [submodule "devices/samsung/a12s"]
-	path = devices/samsung/a12s
+	path = device/samsung/a12s
 	url = https://github.com/ashahir05/dt_sm-127f
 [submodule "vendor/samsung/a12s"]
 	path = vendor/samsung/a12s
