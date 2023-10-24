@@ -66,7 +66,7 @@ jobs:
           chmod a+x ~/bin/repo
           sudo ln -sf ~/bin/repo /usr/bin/repo
 
-          mkdir root && cd ${GITHUB_WORKSPACE}/root/device/${{ github.event.inputs.VENDOR }}/${{ github.event.inputs.DEVICE_NAME }}
+          cd ${GITHUB_WORKSPACE}/device/${{ github.event.inputs.VENDOR }}/${{ github.event.inputs.DEVICE_NAME }}
           repo init --depth=1 -u ${{ github.event.inputs.RECOVERY_URL }} -b ${{ github.event.inputs.RECOVERY_BRANCH }}
           repo sync -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 
@@ -94,7 +94,7 @@ jobs:
           sudo mkdir /mnt/ccache
           sudo mount --bind ${GITHUB_WORKSPACE}/ccache /mnt/ccache
 
-          cd ${GITHUB_WORKSPACE}/root/device/${{ github.event.inputs.VENDOR }}/${{ github.event.inputs.DEVICE_NAME }}
+          cd ${GITHUB_WORKSPACE}/device/${{ github.event.inputs.VENDOR }}/${{ github.event.inputs.DEVICE_NAME }}
           source build/envsetup.sh
 
           export USE_CCACHE=1
@@ -104,7 +104,7 @@ jobs:
 
           export ALLOW_MISSING_DEPENDENCIES='true'
 
-          rm -rf ${GITHUB_WORKSPACE}/root/out
+          rm -rf ${GITHUB_WORKSPACE}/out
           lunch twrp_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka adbd ${{ github.event.inputs.BUILD_TARGET }}image
 
       - name: Save build cache
@@ -120,7 +120,7 @@ jobs:
 
       - name: Check if recovery exists
         run: |
-          cd ${GITHUB_WORKSPACE}/root/
+          cd ${GITHUB_WORKSPACE}/
           if [[ -f out/target/product/${{ github.event.inputs.DEVICE_NAME }}/*.img || -f out/target/product/${{ github.event.inputs.DEVICE_NAME }}/*.zip || -f out/target/product/${{ github.event.inputs.DEVICE_NAME }}/*.tar ]]; then
               exit 0
           else
