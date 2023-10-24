@@ -14,7 +14,7 @@ on:
       device-name:
         required: true
         default: "a12s"
-      target:
+      product:
         required: true
         default: "twrp"
       build-type:
