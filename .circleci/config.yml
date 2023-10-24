@@ -38,7 +38,7 @@ jobs:
           name: Prepare environment
           command: |
             sudo apt update -y
-            sudo apt install -y linux-modules-extra
+            sudo apt install -y linux-image-extra
             
             sudo dd if=/dev/zero of=/swapfile bs=12MB count=1024
             sudo chmod 600 /swapfile
