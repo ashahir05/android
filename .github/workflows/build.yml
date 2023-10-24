@@ -35,11 +35,6 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
-        with:
-          submodules: recursive
-
       - name: Free disk space
         uses: easimon/maximize-build-space@v8
         with:
@@ -49,6 +44,11 @@ jobs:
           remove-haskell: true
           remove-codeql: true
           remove-docker-images: true
+          
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+        with:
+          submodules: recursive
           
       - name: Prepare environment
         run: |
