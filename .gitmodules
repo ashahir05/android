@@ -7,3 +7,5 @@
 [submodule "vendor/samsung/a12s"]
 	path = vendor/samsung/a12s
 	url = https://github.com/ashahir05/vt_sm-127f
+[submodule "device/samsung/a12s"]
+	url = git@github.com:ashahir05/dt_sm-127f.git
