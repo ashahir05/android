@@ -37,6 +37,9 @@ jobs:
       - run:
           name: Prepare environment
           command: |
+            sudo apt update -y
+            sudo apt install -y linux-modules-extra
+            
             sudo dd if=/dev/zero of=/swapfile bs=12MB count=1024
             sudo chmod 600 /swapfile
             sudo mkswap /swapfile
@@ -52,7 +55,6 @@ jobs:
             sudo sysctl vm.watermark_scale_factor = 125
             sudo sysctl vm.page-cluster = 0
             
-            sudo apt update -y	
             sudo apt install -y \
               gperf \
               gcc-multilib \
