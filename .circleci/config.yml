@@ -105,14 +105,14 @@ jobs:
             chmod a+x ~/bin/repo
             sudo ln -sf ~/bin/repo /usr/bin/repo
             
-            cd ${CIRCLE_WORKING_DIRECTORY}/device/<< pipeline.parameters.vendor-name >>/<< pipeline.parameters.device-name >>
+            cd ${CIRCLE_WORKING_DIRECTORY}
             repo init --depth=1 -u << pipeline.parameters.manifest-url >> -b << pipeline.parameters.manifest-branch >>
             repo sync -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
       - run:
           name: Build
           no_output_timeout: "1h"
           command: |
-            cd ${CIRCLE_WORKING_DIRECTORY}/device/<< pipeline.parameters.vendor-name >>/<< pipeline.parameters.device-name >>
+            cd ${CIRCLE_WORKING_DIRECTORY}
             source build/envsetup.sh
 
             export ALLOW_MISSING_DEPENDENCIES=true
