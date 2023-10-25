@@ -61,6 +61,7 @@ jobs:
               gcc-10-multilib \
               g++-multilib \
               g++-10-multilib \
+              ccache \
               libc6-dev \
               lib32ncurses5-dev \
               x11proto-core-dev \
@@ -108,6 +109,18 @@ jobs:
             cd ${CIRCLE_WORKING_DIRECTORY}
             repo init --depth=1 -u << pipeline.parameters.manifest-url >> -b << pipeline.parameters.manifest-branch >>
             repo sync -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
+            
+      - run:
+          name: Setup cache
+          command: |
+            mkdir -p ${CIRCLE_WORKING_DIRECTORY}/.ccache
+            sudo mkdir -p /mnt/ccache
+            
+            sudo mount --bind ${CIRCLE_WORKING_DIRECTORY}/.ccache /mnt/ccache
+            
+      - restore_cache:
+          keys: << pipeline.parameters.vendor-name >>-<< pipeline.parameters.device-name >>-ccache
+
       - run:
           name: Build
           no_output_timeout: "1h"
@@ -115,10 +128,21 @@ jobs:
             cd ${CIRCLE_WORKING_DIRECTORY}
             source build/envsetup.sh
 
+            export USE_CCACHE=1
+            export CCACHE_DIR=/mnt/ccache
+            ccache -M 10G
+            
             export ALLOW_MISSING_DEPENDENCIES=true
 
             rm -rf ${CIRCLE_WORKING_DIRECTORY}/out
             lunch << pipeline.parameters.product >>_<< pipeline.parameters.device-name >>-<< pipeline.parameters.build-type >> && make clean && mka adbd << pipeline.parameters.target >>
+            
+      - save_cache:
+          name: Save cache
+          when: always
+          key: << pipeline.parameters.vendor-name >>-<< pipeline.parameters.device-name >>-ccache
+          paths:
+            - .ccache
 
       - persist_to_workspace:
           root: out/target/product/
