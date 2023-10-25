@@ -150,7 +150,7 @@ jobs:
         if: always()
         uses: actions/cache/save@v3
         with:
-          path: ${GITHUB_WORKSPACE}/.ccache
+          path: ${{ github.workspace	}}/.ccache
           key: ${{ steps.load-ccache.outputs.cache-primary-key }}
       
       - name: Upload to releases
