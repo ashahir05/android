@@ -38,6 +38,7 @@ jobs:
       - name: Free disk space
         uses: easimon/maximize-build-space@v8
         with:
+          temp-reserve-mb: 10500
           swap-size-mb: 12228
           remove-dotnet: true
           remove-android: true
@@ -71,6 +72,7 @@ jobs:
             gcc-10-multilib \
             g++-multilib \
             g++-10-multilib \
+            ccache \
             libc6-dev \
             lib32ncurses5-dev \
             x11proto-core-dev \
@@ -117,17 +119,43 @@ jobs:
           cd ${GITHUB_WORKSPACE}
           repo init --depth=1 -u ${{ github.event.inputs.manifest-url }} -b ${{ github.event.inputs.manifest-branch }}
           repo sync -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
-
+      
+      - name: Setup cache
+        run: |
+          mkdir -p ${GITHUB_WORKSPACE}/.ccache
+          sudo mkdir -p /mnt/ccache
+          
+          sudo mount --bind ${GITHUB_WORKSPACE}/.ccache /mnt/ccache
+          
+      - name: Load cache
+        id: load-ccache
+        uses: actions/cache/restore@v3
+        with:
+          path: ${GITHUB_WORKSPACE}/.ccache
+          key: ${{ github.event.inputs.vendor }}-${{ github.event.inputs.device-name }}-ccache
+      
       - name: Build
         run: |
           cd ${GITHUB_WORKSPACE}
           source build/envsetup.sh
+
+          export USE_CCACHE=1
+          export CCACHE_DIR=/mnt/ccache
+          ccache -M 10G
 
           export ALLOW_MISSING_DEPENDENCIES='true'
 
           rm -rf ${GITHUB_WORKSPACE}/out
           lunch ${{ github.event.inputs.product }}_${{ github.event.inputs.device-name }}-${{ github.event.inputs.build-type }} && make clean && mka adbd ${{ github.event.inputs.target }}
           
+      - name: Save cache
+        id: save-ccache
+        if: always()
+        uses: actions/cache/save@v3
+        with:
+          path: ${GITHUB_WORKSPACE}/.ccache
+          key: ${{ steps.load-ccache.outputs.cache-primary-key }}
+      
       - name: Upload to releases
         uses: softprops/action-gh-release@v1
         with:
